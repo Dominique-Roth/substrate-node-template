@@ -38,6 +38,7 @@ pub use frame_support::{
 	StorageValue,
 };
 pub use frame_system::Call as SystemCall;
+pub use frame_support::PalletId;
 pub use pallet_balances::Call as BalancesCall;
 pub use pallet_timestamp::Call as TimestampCall;
 use pallet_transaction_payment::{ConstFeeMultiplier, CurrencyAdapter, Multiplier};
@@ -46,7 +47,7 @@ pub use sp_runtime::BuildStorage;
 pub use sp_runtime::{Perbill, Permill};
 
 /// Import the template pallet.
-pub use pallet_template;
+pub use pallet_prediction_gambling;
 
 /// An index to a block.
 pub type BlockNumber = u32;
@@ -263,9 +264,17 @@ impl pallet_sudo::Config for Runtime {
 	type RuntimeCall = RuntimeCall;
 }
 
-/// Configure the pallet-template in pallets/template.
-impl pallet_template::Config for Runtime {
+parameter_types! {
+	pub const PredictionGamblingPalletId:PalletId = PalletId(*b"predgamb");
+	pub const PredictionGamblingEpochBlockLength:u32 = 64;
+}
+
+/// Prediction Gambling Pallet Runtime Configuration
+impl pallet_prediction_gambling::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
+	type Currency = Balances;
+	type PalletId = PredictionGamblingPalletId;
+	type EpochBlockLength = PredictionGamblingEpochBlockLength;
 }
 
 // Create the runtime by composing the FRAME pallets that were previously configured.
@@ -284,7 +293,7 @@ construct_runtime!(
 		TransactionPayment: pallet_transaction_payment,
 		Sudo: pallet_sudo,
 		// Include the custom logic from the pallet-template in the runtime.
-		TemplateModule: pallet_template,
+		predictionGambling: pallet_prediction_gambling,
 	}
 );
 
